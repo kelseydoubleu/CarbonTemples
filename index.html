@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carbon Capital</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: system-ui, sans-serif; background-color: #F5F5F5; color: #0B0B0B; }
+        .container { max-width: 390px; margin: 0 auto; min-height: 100vh; background: white; }
+        
+        .screen { display: none; min-height: 100vh; }
+        .screen.active { display: flex; flex-direction: column; }
+        
+        /* Welcome Screen */
+        .welcome-screen { background: linear-gradient(135deg, #165B33, #22C55E); color: white; text-align: center; padding: 60px 30px; justify-content: center; }
+        .logo { font-size: 48px; margin-bottom: 16px; }
+        .welcome-title { font-size: 32px; font-weight: 700; margin-bottom: 16px; line-height: 1.2; }
+        .welcome-subtitle { font-size: 18px; line-height: 1.5; opacity: 0.95; margin-bottom: 40px; }
+        .btn-primary { background: white; color: #165B33; border: none; padding: 16px 48px; border-radius: 12px; font-size: 18px; font-weight: 600; cursor: pointer; }
+        .footer-text { font-size: 12px; opacity: 0.8; margin-top: 40px; }
+        
+        /* Location List Screen */
+        .header { padding: 20px; border-bottom: 1px solid #E5E5E5; display: flex; justify-content: space-between; align-items: center; background: white; }
+        .header-title { font-size: 24px; font-weight: 700; }
+        .filter-icon { font-size: 20px; cursor: pointer; }
+        
+        .location-list { padding: 16px; overflow-y: auto; flex: 1; }
+        .location-card { background: white; border: 1px solid #E5E5E5; border-radius: 16px; padding: 20px; margin-bottom: 16px; cursor: pointer; transition: all 0.2s ease; position: relative; }
+        .location-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        
+        .card-header { display: flex; align-items: center; margin-bottom: 12px; }
+        .location-icon { font-size: 32px; margin-right: 16px; }
+        .card-info { flex: 1; }
+        .location-name { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
+        .carbon-score { color: #FFD700; font-size: 14px; margin-bottom: 4px; }
+        .review-count { font-size: 12px; color: #666; }
+        .bookmark-btn { position: absolute; top: 20px; right: 20px; font-size: 20px; cursor: pointer; }
+        
+        .card-details { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; }
+        .distance { font-size: 14px; color: #666; }
+        .quick-tag { background: #F0F0F0; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 500; color: #333; }
+        
+        /* Profile Screen */
+        .profile-screen { background: #F5F5F5; }
+        .profile-header-nav { padding: 16px 20px; background: white; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #E5E5E5; }
+        .back-btn { font-size: 20px; cursor: pointer; background: none; border: none; }
+        .profile-name { font-size: 18px; font-weight: 600; }
+        .share-btn { font-size: 20px; cursor: pointer; }
+        
+        .profile-hero { background: linear-gradient(135deg, #165B33, #22C55E); padding: 40px 20px; text-align: center; color: white; }
+        .profile-hero-title { font-size: 28px; font-weight: 700; margin-bottom: 16px; }
+        .profile-score { font-size: 18px; margin-bottom: 8px; }
+        .profile-score-stars { font-size: 24px; color: #FFD700; }
+        .profile-reviews { font-size: 14px; opacity: 0.9; }
+        .profile-actions { display: flex; gap: 12px; margin-top: 20px; justify-content: center; }
+        .action-btn { background: rgba(255,255,255,0.2); border: 1px solid white; color: white; padding: 8px 16px; border-radius: 8px; font-size: 14px; cursor: pointer; }
+        
+        .profile-content { padding: 20px; }
+        .section-title { font-size: 14px; font-weight: 600; color: #666; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .about-text { font-size: 15px; line-height: 1.6; color: #333; margin-bottom: 30px; }
+        
+        .services-grid { display: grid; gap: 12px; margin-bottom: 30px; }
+        .service-card { background: white; border: 1px solid #E5E5E5; border-radius: 12px; padding: 16px; cursor: pointer; transition: all 0.2s ease; }
+        .service-card:hover { border-color: #22C55E; }
+        .service-header { display: flex; align-items: center; margin-bottom: 8px; }
+        .service-icon { font-size: 24px; margin-right: 12px; }
+        .service-title { font-size: 16px; font-weight: 600; }
+        .service-description { font-size: 14px; color: #666; margin-bottom: 8px; }
+        .service-details { font-size: 13px; color: #22C55E; font-weight: 500; margin-bottom: 8px; }
+        .service-cta { background: #22C55E; color: white; border: none; padding: 8px 16px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; width: 100%; }
+        
+        .reviews-section { }
+        .review-card { background: white; border: 1px solid #E5E5E5; border-radius: 12px; padding: 16px; margin-bottom: 12px; }
+        .review-header { display: flex; justify-content: space-between; margin-bottom: 8px; }
+        .reviewer-name { font-weight: 600; font-size: 14px; }
+        .review-stars { color: #FFD700; font-size: 14px; }
+        .review-text { font-size: 14px; color: #666; line-height: 1.5; }
+        .see-all-link { color: #22C55E; font-weight: 600; font-size: 14px; text-align: center; padding: 12px; cursor: pointer; }
+        
+        .bottom-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 390px; max-width: 100%; background: white; border-top: 1px solid #E5E5E5; display: flex; }
+        .nav-item { flex: 1; padding: 12px 8px; text-align: center; cursor: pointer; }
+        .nav-item.active { color: #22C55E; }
+        .nav-icon { font-size: 20px; margin-bottom: 4px; }
+        .nav-label { font-size: 11px; font-weight: 500; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Welcome Screen -->
+        <div class="screen active" id="welcome-screen">
+            <div class="welcome-screen">
+                <div class="logo">🌱</div>
+                <h1 class="welcome-title">Welcome to Carbon Capital</h1>
+                <p class="welcome-subtitle">We help you discover and support businesses based on their climate impact. Find the most sustainable spots near you.</p>
+                <button class="btn-primary" onclick="showLocations()">I'm in</button>
+                <p class="footer-text">Scores based on verified carbon accounting</p>
+            </div>
+        </div>
+
+        <!-- Location List Screen -->
+        <div class="screen" id="locations-screen">
+            <div class="header">
+                <h1 class="header-title">Near You</h1>
+                <div class="filter-icon">⚙️</div>
+            </div>
+            
+            <div class="location-list">
+                <div class="location-card" onclick="showProfile('cafe-carbonio')">
+                    <div class="bookmark-btn">🔖</div>
+                    <div class="card-header">
+                        <div class="location-icon">☕</div>
+                        <div class="card-info">
+                            <div class="location-name">Café Carbonio</div>
+                            <div class="carbon-score">★★★★★ 5.0</div>
+                            <div class="review-count">248 reviews</div>
+                        </div>
+                    </div>
+                    <div class="card-details">
+                        <div class="distance">0.3 mi</div>
+                        <div class="quick-tag">Carbon-negative coffee</div>
+                    </div>
+                </div>
+
+                <div class="location-card" onclick="showProfile('church-carbon')">
+                    <div class="bookmark-btn">🔖</div>
+                    <div class="card-header">
+                        <div class="location-icon">⛪</div>
+                        <div class="card-info">
+                            <div class="location-name">Church of Carbon</div>
+                            <div class="carbon-score">★★★★☆ 4.0</div>
+                            <div class="review-count">89 reviews</div>
+                        </div>
+                    </div>
+                    <div class="card-details">
+                        <div class="distance">0.8 mi</div>
+                        <div class="quick-tag">Community climate hub</div>
+                    </div>
+                </div>
+
+                <div class="location-card" onclick="showProfile('metro-market')">
+                    <div class="bookmark-btn">🔖</div>
+                    <div class="card-header">
+                        <div class="location-icon">🚂</div>
+                        <div class="card-info">
+                            <div class="location-name">Metro North Carbon Market</div>
+                            <div class="carbon-score">★★★★★ 5.0</div>
+                            <div class="review-count">342 reviews</div>
+                        </div>
+                    </div>
+                    <div class="card-details">
+                        <div class="distance">1.2 mi</div>
+                        <div class="quick-tag">Zero-waste marketplace</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bottom-nav">
+                <div class="nav-item active">
+                    <div class="nav-icon">📍</div>
+                    <div class="nav-label">Nearby</div>
+                </div>
+                <div class="nav-item">
+                    <div class="nav-icon">🔖</div>
+                    <div class="nav-label">Saved</div>
+                </div>
+                <div class="nav-item">
+                    <div class="nav-icon">👤</div>
+                    <div class="nav-label">Profile</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Café Carbonio Profile -->
+        <div class="screen profile-screen" id="profile-cafe-carbonio">
+            <div class="profile-header-nav">
+                <button class="back-btn" onclick="showLocations()">←</button>
+                <div class="profile-name">Café Carbonio</div>
+                <div class="share-btn">⤴</div>
+            </div>
+
+            <div class="profile-hero">
+                <div class="profile-hero-title">Café Carbonio</div>
+                <div class="profile-score">
+                    <div class="profile-score-stars">★★★★★</div>
+                    <div>5.0 Carbon Score</div>
+                </div>
+                <div class="profile-reviews">248 reviews</div>
+                <div class="profile-actions">
+                    <button class="action-btn">🔖 Bookmark</button>
+                    <button class="action-btn">⤴ Share</button>
+                </div>
+            </div>
+
+            <div class="profile-content">
+                <div class="section-title">About</div>
+                <div class="about-text">Every cup removes CO₂ from the atmosphere through regenerative sourcing, reusable cups, and coffee grounds recycling.</div>
+
+                <div class="section-title">Services & Experiences</div>
+                <div class="services-grid">
+                    <div class="service-card" onclick="alert('Opening coffee ordering...')">
+                        <div class="service-header">
+                            <div class="service-icon">☕</div>
+                            <div class="service-title">Get a Coffee</div>
+                        </div>
+                        <div class="service-description">Carbon-negative drinks with Carbon Capital discounts</div>
+                        <button class="service-cta">Order now</button>
+                    </div>
+
+                    <div class="service-card">
+                        <div class="service-header">
+                            <div class="service-icon">🎨</div>
+                            <div class="service-title">Coffee & Ceramics Class</div>
+                        </div>
+                        <div class="service-description">Learn pottery while sipping sustainable coffee</div>
+                        <div class="service-details">Saturdays 2-4pm</div>
+                        <button class="service-cta">Book class</button>
+                    </div>
+
+                    <div class="service-card">
+                        <div class="service-header">
+                            <div class="service-icon">🛠️</div>
+                            <div class="service-title">Book Materials Studio</div>
+                        </div>
+                        <div class="service-description">Create with reclaimed materials</div>
+                        <div class="service-details">1-hour sessions available</div>
+                        <button class="service-cta">Reserve time</button>
+                    </div>
+                </div>
+
+                <div class="section-title">Recent Reviews</div>
+                <div class="review-card">
+                    <div class="review-header">
+                        <div class="reviewer-name">Alex Chen</div>
+                        <div class="review-stars">★★★★★</div>
+                    </div>
+                    <div class="review-text">Best oat latte in the city! Love that every cup actively removes carbon. The ceramics class was amazing too.</div>
+                </div>
+                <div class="review-card">
+                    <div class="review-header">
+                        <div class="reviewer-name">Maya Patel</div>
+                        <div class="review-stars">★★★★★</div>
+                    </div>
+                    <div class="review-text">Finally, a café that walks the talk on sustainability. The materials studio is incredible.</div>
+                </div>
+                <div class="see-all-link">See all 248 reviews →</div>
+            </div>
+        </div>
+
+        <!-- Church of Carbon Profile -->
+        <div class="screen profile-screen" id="profile-church-carbon">
+            <div class="profile-header-nav">
+                <button class="back-btn" onclick="showLocations()">←</button>
+                <div class="profile-name">Church of Carbon</div>
+                <div class="share-btn">⤴</div>
+            </div>
+
+            <div class="profile-hero">
+                <div class="profile-hero-title">Church of Carbon</div>
+                <div class="profile-score">
+                    <div class="profile-score-stars">★★★★☆</div>
+                    <div>4.0 Carbon Score</div>
+                </div>
+                <div class="profile-reviews">89 reviews</div>
+                <div class="profile-actions">
+                    <button class="action-btn">🔖 Bookmark</button>
+                    <button class="action-btn">⤴ Share</button>
+                </div>
+            </div>
+
+            <div class="profile-content">
+                <div class="section-title">About</div>
+                <div class="about-text">A spiritual community dedicated to environmental action. All events powered by 100% renewable energy.</div>
+
+                <div class="section-title">Services & Experiences</div>
+                <div class="services-grid">
+                    <div class="service-card">
+                        <div class="service-header">
+                            <div class="service-icon">🕊️</div>
+                            <div class="service-title">Saturday Morning Worship</div>
+                        </div>
+                        <div class="service-description">Climate-focused spiritual gathering</div>
+                        <div class="service-details">Saturdays 9am</div>
+                        <button class="service-cta">RSVP</button>
+                    </div>
+
+                    <div class="service-card">
+                        <div class="service-header">
+                            <div class="service-icon">☀️</div>
+                            <div class="service-title">Sunday Morning Worship</div>
+                        </div>
+                        <div class="service-description">Weekly community service</div>
+                        <div class="service-details">Sundays 10am</div>
+                        <button class="service-cta">RSVP</button>
+                    </div>
+
+                    <div class="service-card">
+                        <div class="service-header">
+                            <div class="service-icon">🌱</div>
+                            <div class="service-title">Volunteer Events</div>
+                        </div>
+                        <div class="service-description">Tree planting, beach cleanups, and more</div>
+                        <div class="service-details">Various times</div>
+                        <button class="service-cta">See schedule</button>
+                    </div>
+                </div>
+
+                <div class="section-title">Recent Reviews</div>
+                <div class="review-card">
+                    <div class="review-header">
+                        <div class="reviewer-name">Jordan Kim</div>
+                        <div class="review-stars">★★★★☆</div>
+                    </div>
+                    <div class="review-text">Meaningful community focused on real climate action. The volunteer events are well-organized and impactful.</div>
+                </div>
+                <div class="see-all-link">See all 89 reviews →</div>
+            </div>
+        </div>
+
+        <!-- Metro North Carbon Market Profile -->
+        <div class="screen profile-screen" id="profile-metro-market">
+            <div class="profile-header-nav">
+                <button class="back-btn" onclick="showLocations()">←</button>
+                <div class="profile-name">Metro North Carbon Market</div>
+                <div class="share-btn">⤴</div>
+            </div>
+
+            <div class="profile-hero">
+                <div class="profile-hero-title">Metro North Carbon Market</div>
+                <div class="profile-score">
+                    <div class="profile-score-stars">★★★★★</div>
+                    <div>5.0 Carbon Score</div>
+                </div>
+                <div class="profile-reviews">342 reviews</div>
+                <div class="profile-actions">
+                    <button class="action-btn">🔖 Bookmark</button>
+                    <button class="action-btn">⤴ Share</button>
+                </div>
+            </div>
+
+            <div class="profile-content">
+                <div class="section-title">About</div>
+                <div class="about-text">Located inside Metro North Station. A zero-waste marketplace featuring local makers, repair services, and sustainable goods.</div>
+
+                <div class="section-title">Services & Experiences</div>
+                <div class="services-grid">
+                    <div class="service-card">
+                        <div class="service-header">
+                            <div class="service-icon">🛍️</div>
+                            <div class="service-title">Market Hours</div>
+                        </div>
+                        <div class="service-description">Shop local, sustainable goods</div>
+                        <div class="service-details">Mon-Fri 7am-8pm, Sat-Sun 9am-6pm</div>
+                        <button class="service-cta">View vendors</button>
+                    </div>
+
+                    <div class="service-card">
+                        <div class="service-header">
+                            <div class="service-icon">♻️</div>
+                            <div class="service-title">Materials Hub Tour</div>
+                        </div>
+                        <div class="service-description">See how we process reclaimed materials</div>
+                        <div class="service-details">Tours at 11am & 3pm daily</div>
+                        <button class="service-cta">Book tour</button>
+                    </div>
+
+                    <div class="service-card">
+                        <div class="service-header">
+                            <div class="service-icon">🔧</div>
+                            <div class="service-title">Repair Café</div>
+                        </div>
+                        <div class="service-description">Fix your stuff instead of replacing it</div>
+                        <div class="service-details">Wednesdays 4-7pm</div>
+                        <button class="service-cta">Schedule repair</button>
+                    </div>
+                </div>
+
+                <div class="section-title">Recent Reviews</div>
+                <div class="review-card">
+                    <div class="review-header">
+                        <div class="reviewer-name">Sam Rodriguez</div>
+                        <div class="review-stars">★★★★★</div>
+                    </div>
+                    <div class="review-text">Perfect location in the station. Fixed my coffee grinder at the repair café instead of buying a new one!</div>
+                </div>
+                <div class="review-card">
+                    <div class="review-header">
+                        <div class="reviewer-name">Emma Wilson</div>
+                        <div class="review-stars">★★★★★</div>
+                    </div>
+                    <div class="review-text">The materials hub tour was eye-opening. Love supporting this zero-waste initiative.</div>
+                </div>
+                <div class="see-all-link">See all 342 reviews →</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showScreen(screenId) {
+            var screens = document.querySelectorAll('.screen');
+            for (var i = 0; i < screens.length; i++) {
+                screens[i].classList.remove('active');
+            }
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        function showLocations() {
+            showScreen('locations-screen');
+        }
+
+        function showProfile(profileId) {
+            showScreen('profile-' + profileId);
+        }
+    </script>
+</body>
+</html>
