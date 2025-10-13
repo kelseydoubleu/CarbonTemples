@@ -33,7 +33,10 @@
         .location-icon { font-size: 32px; margin-right: 16px; }
         .card-info { flex: 1; }
         .location-name { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
-        .carbon-score { color: #FFD700; font-size: 14px; margin-bottom: 4px; }
+        .carbon-score { font-size: 14px; margin-bottom: 4px; }
+        .carbon-score.good { color: #22C55E; }
+        .carbon-score.medium { color: #FFD700; }
+        .carbon-score.bad { color: #EF4444; }
         .review-count { font-size: 12px; color: #666; }
         .bookmark-btn { position: absolute; top: 20px; right: 20px; font-size: 20px; cursor: pointer; }
         
@@ -112,7 +115,7 @@
                         <div class="location-icon">☕</div>
                         <div class="card-info">
                             <div class="location-name">Café Carbonio</div>
-                            <div class="carbon-score">★★★★★ 5.0</div>
+                            <div class="carbon-score good">★★★★★ 5.0</div>
                             <div class="review-count">248 reviews</div>
                         </div>
                     </div>
@@ -128,7 +131,7 @@
                         <div class="location-icon">⛪</div>
                         <div class="card-info">
                             <div class="location-name">Church of Carbon</div>
-                            <div class="carbon-score">★★★★☆ 4.0</div>
+                            <div class="carbon-score medium">★★★★☆ 4.0</div>
                             <div class="review-count">89 reviews</div>
                         </div>
                     </div>
@@ -144,13 +147,45 @@
                         <div class="location-icon">🚂</div>
                         <div class="card-info">
                             <div class="location-name">Metro North Carbon Market</div>
-                            <div class="carbon-score">★★★★★ 5.0</div>
+                            <div class="carbon-score good">★★★★★ 5.0</div>
                             <div class="review-count">342 reviews</div>
                         </div>
                     </div>
                     <div class="card-details">
                         <div class="distance">1.2 mi</div>
                         <div class="quick-tag">Zero-waste marketplace</div>
+                    </div>
+                </div>
+
+                <div class="location-card" onclick="showProfile('starbucks')">
+                    <div class="bookmark-btn">🔖</div>
+                    <div class="card-header">
+                        <div class="location-icon">☕</div>
+                        <div class="card-info">
+                            <div class="location-name">Starbucks</div>
+                            <div class="carbon-score bad">★★☆☆☆ 2.0</div>
+                            <div class="review-count">1,247 reviews</div>
+                        </div>
+                    </div>
+                    <div class="card-details">
+                        <div class="distance">0.4 mi</div>
+                        <div class="quick-tag">Single-use focused</div>
+                    </div>
+                </div>
+
+                <div class="location-card" onclick="showProfile('hm')">
+                    <div class="bookmark-btn">🔖</div>
+                    <div class="card-header">
+                        <div class="location-icon">👕</div>
+                        <div class="card-info">
+                            <div class="location-name">H&M</div>
+                            <div class="carbon-score bad">★☆☆☆☆ 1.5</div>
+                            <div class="review-count">892 reviews</div>
+                        </div>
+                    </div>
+                    <div class="card-details">
+                        <div class="distance">0.6 mi</div>
+                        <div class="quick-tag">Fast fashion</div>
                     </div>
                 </div>
             </div>
@@ -391,6 +426,165 @@
                     <div class="review-text">The materials hub tour was eye-opening. Love supporting this zero-waste initiative.</div>
                 </div>
                 <div class="see-all-link">See all 342 reviews →</div>
+            </div>
+        </div>
+
+        <!-- Starbucks Profile -->
+        <div class="screen profile-screen" id="profile-starbucks">
+            <div class="profile-header-nav">
+                <button class="back-btn" onclick="showLocations()">←</button>
+                <div class="profile-name">Starbucks</div>
+                <div class="share-btn">⤴</div>
+            </div>
+
+            <div class="profile-hero" style="background: linear-gradient(135deg, #666, #888);">
+                <div class="profile-hero-title">Starbucks</div>
+                <div class="profile-score">
+                    <div class="profile-score-stars">★★☆☆☆</div>
+                    <div>2.0 Carbon Score</div>
+                </div>
+                <div class="profile-reviews">1,247 reviews</div>
+                <div class="profile-actions">
+                    <button class="action-btn">🔖 Bookmark</button>
+                    <button class="action-btn">⤴ Share</button>
+                </div>
+            </div>
+
+            <div class="profile-content">
+                <div class="section-title">About</div>
+                <div class="about-text">Global coffee chain with convenient locations. Heavy reliance on single-use cups and packaging despite recycling initiatives.</div>
+
+                <div class="section-title">Why the low carbon score?</div>
+                <div style="background: #FFF3CD; border-left: 4px solid #FFC107; padding: 16px; border-radius: 8px; margin-bottom: 24px; font-size: 14px; line-height: 1.5;">
+                    <strong>Carbon Impact:</strong><br>
+                    • 99% of drinks served in single-use cups<br>
+                    • Global supply chain with high food miles<br>
+                    • High dairy consumption (milk production is carbon-intensive)<br>
+                    • Energy-intensive stores (refrigeration, AC, lighting)<br>
+                    • Plastic packaging for food items
+                </div>
+
+                <div class="section-title">Services</div>
+                <div class="services-grid">
+                    <div class="service-card">
+                        <div class="service-header">
+                            <div class="service-icon">☕</div>
+                            <div class="service-title">Order Coffee</div>
+                        </div>
+                        <div class="service-description">Wide variety of drinks and food</div>
+                        <div class="service-details">Open daily 6am-9pm</div>
+                        <button class="service-cta">Order now</button>
+                    </div>
+
+                    <div class="service-card">
+                        <div class="service-header">
+                            <div class="service-icon">⭐</div>
+                            <div class="service-title">Rewards Program</div>
+                        </div>
+                        <div class="service-description">Earn stars with every purchase</div>
+                        <button class="service-cta">Join now</button>
+                    </div>
+                </div>
+
+                <div class="section-title">Recent Reviews</div>
+                <div class="review-card">
+                    <div class="review-header">
+                        <div class="reviewer-name">Lisa Chen</div>
+                        <div class="review-stars">★★☆☆☆</div>
+                    </div>
+                    <div class="review-text">Convenient but wish they'd do more for sustainability. So much waste from single-use cups.</div>
+                </div>
+                <div class="review-card">
+                    <div class="review-header">
+                        <div class="reviewer-name">Mike Johnson</div>
+                        <div class="review-stars">★★★☆☆</div>
+                    </div>
+                    <div class="review-text">Reliable coffee but the environmental impact is concerning. Would love to see real reusable cup programs.</div>
+                </div>
+                <div class="see-all-link">See all 1,247 reviews →</div>
+            </div>
+        </div>
+
+        <!-- H&M Profile -->
+        <div class="screen profile-screen" id="profile-hm">
+            <div class="profile-header-nav">
+                <button class="back-btn" onclick="showLocations()">←</button>
+                <div class="profile-name">H&M</div>
+                <div class="share-btn">⤴</div>
+            </div>
+
+            <div class="profile-hero" style="background: linear-gradient(135deg, #555, #777);">
+                <div class="profile-hero-title">H&M</div>
+                <div class="profile-score">
+                    <div class="profile-score-stars">★☆☆☆☆</div>
+                    <div>1.5 Carbon Score</div>
+                </div>
+                <div class="profile-reviews">892 reviews</div>
+                <div class="profile-actions">
+                    <button class="action-btn">🔖 Bookmark</button>
+                    <button class="action-btn">⤴ Share</button>
+                </div>
+            </div>
+
+            <div class="profile-content">
+                <div class="section-title">About</div>
+                <div class="about-text">Fast fashion retailer with affordable clothing. Business model based on rapid production cycles and frequent collections.</div>
+
+                <div class="section-title">Why the low carbon score?</div>
+                <div style="background: #F8D7DA; border-left: 4px solid #DC3545; padding: 16px; border-radius: 8px; margin-bottom: 24px; font-size: 14px; line-height: 1.5;">
+                    <strong>Carbon Impact:</strong><br>
+                    • Fast fashion model encourages overconsumption<br>
+                    • New collections every few weeks create textile waste<br>
+                    • Global manufacturing with long supply chains<br>
+                    • Synthetic fabrics release microplastics<br>
+                    • Most items worn less than 10 times before disposal<br>
+                    • Massive water and energy use in production
+                </div>
+
+                <div class="section-title">Services</div>
+                <div class="services-grid">
+                    <div class="service-card">
+                        <div class="service-header">
+                            <div class="service-icon">👕</div>
+                            <div class="service-title">Shop New Arrivals</div>
+                        </div>
+                        <div class="service-description">Latest fashion trends at low prices</div>
+                        <div class="service-details">New items weekly</div>
+                        <button class="service-cta">Browse now</button>
+                    </div>
+
+                    <div class="service-card">
+                        <div class="service-header">
+                            <div class="service-icon">♻️</div>
+                            <div class="service-title">Garment Recycling</div>
+                        </div>
+                        <div class="service-description">Drop off old clothes for recycling</div>
+                        <div class="service-details">Limited impact program</div>
+                        <button class="service-cta">Learn more</button>
+                    </div>
+                </div>
+
+                <div style="background: #D1ECF1; border-left: 4px solid #0C5460; padding: 16px; border-radius: 8px; margin-bottom: 24px; font-size: 14px; line-height: 1.5;">
+                    <strong>💡 Lower-carbon alternative:</strong><br>
+                    Consider thrift stores, clothing swaps, or rental services. Buying secondhand reduces demand for new production and keeps textiles out of landfills.
+                </div>
+
+                <div class="section-title">Recent Reviews</div>
+                <div class="review-card">
+                    <div class="review-header">
+                        <div class="reviewer-name">Sarah Martinez</div>
+                        <div class="review-stars">★☆☆☆☆</div>
+                    </div>
+                    <div class="review-text">Cheap clothes but the environmental cost is too high. Quality is poor so everything falls apart quickly.</div>
+                </div>
+                <div class="review-card">
+                    <div class="review-header">
+                        <div class="reviewer-name">David Park</div>
+                        <div class="review-stars">★★☆☆☆</div>
+                    </div>
+                    <div class="review-text">Trying to shop less here after learning about fast fashion's impact. Their recycling program feels like greenwashing.</div>
+                </div>
+                <div class="see-all-link">See all 892 reviews →</div>
             </div>
         </div>
     </div>
