@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carbon Pulse</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --carbon-black: #0A0A0A;
+            --carbon-dark: #1A1A1A;
+            --carbon-mid: #2A2A2A;
+            --carbon-light: #3A3A3A;
+            --pulse-green: #00FF88;
+            --pulse-yellow: #FFE566;
+            --pulse-orange: #FF9F43;
+            --pulse-red: #FF6B6B;
+            --pulse-blue: #66D9FF;
+            --text-primary: #FFFFFF;
+            --text-secondary: #888888;
+            --text-muted: #555555;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Syne', sans-serif; background: var(--carbon-black); color: var(--text-primary); }
+        .container { max-width: 430px; margin: 0 auto; min-height: 100vh; background: var(--carbon-black); }
+        .screen { display: none; min-height: 100vh; flex-direction: column; }
+        .screen.active { display: flex; }
+
+        /* Intro Screen */
+        .intro-screen { 
+            padding: 0; 
+            height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+            overflow: hidden;
+        }
+        .intro-hero {
+            padding: 40px 24px 24px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+        .intro-logo {
+            width: 64px; height: 64px; border: 2px solid var(--pulse-green); border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(0,255,136,0.4); }
+            50% { box-shadow: 0 0 0 12px rgba(0,255,136,0); }
+        }
+        .intro-logo-inner { font-family: 'Space Mono'; font-size: 24px; font-weight: 700; color: var(--pulse-green); }
+        .intro-title { font-size: 28px; font-weight: 800; letter-spacing: -1px; margin-bottom: 4px; }
+        .intro-title span { color: var(--pulse-green); }
+        .intro-tagline { font-family: 'Space Mono'; font-size: 9px; color: var(--text-muted); letter-spacing: 2px; }
+
+        .intro-content { 
+            flex: 1; 
+            padding: 0 24px; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 16px;
+        }
+        .intro-stats-row {
+            display: flex;
+            gap: 12px;
+        }
+        .intro-stat {
+            flex: 1;
+            background: var(--carbon-dark); border: 1px solid var(--pulse-green); border-radius: 12px;
+            padding: 14px 12px; text-align: center;
+        }
+        .intro-stat-row { display: flex; align-items: baseline; justify-content: center; gap: 4px; }
+        .intro-stat-number { font-family: 'Space Mono'; font-size: 36px; font-weight: 700; color: var(--pulse-green); line-height: 1; }
+        .intro-stat-pct { font-family: 'Space Mono'; font-size: 18px; font-weight: 700; color: var(--pulse-green); }
+        .intro-stat-label { font-size: 11px; color: var(--text-secondary); margin-top: 4px; }
+
+        .intro-text { font-size: 14px; color: var(--text-secondary); line-height: 1.6; text-align: center; }
+        .intro-text strong { color: var(--text-primary); }
+
+        .intro-points { 
+            display: flex; 
+            gap: 8px; 
+        }
+        .intro-point {
+            flex: 1;
+            background: var(--carbon-dark); 
+            border-left: 2px solid var(--pulse-green);
+            padding: 10px 12px; 
+            border-radius: 0 8px 8px 0;
+        }
+        .intro-point-title { font-size: 11px; font-weight: 600; margin-bottom: 2px; }
+        .intro-point-desc { font-size: 10px; color: var(--text-muted); }
+
+        .intro-cta {
+            padding: 20px 24px;
+            padding-bottom: max(20px, env(safe-area-inset-bottom));
+            flex-shrink: 0;
+        }
+        .btn-primary {
+            width: 100%; background: var(--pulse-green); color: var(--carbon-black); border: none;
+            padding: 16px; border-radius: 12px; font-family: 'Syne'; font-size: 14px;
+            font-weight: 700; cursor: pointer; text-transform: uppercase; letter-spacing: 2px;
+        }
+        .btn-primary:hover { transform: scale(1.02); box-shadow: 0 0 30px rgba(0,255,136,0.3); }
+
+        /* Header */
+        .header { padding: 16px 20px; background: var(--carbon-black); border-bottom: 1px solid var(--carbon-mid); position: sticky; top: 0; z-index: 100; }
+        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .header-logo { font-size: 18px; font-weight: 800; letter-spacing: -1px; }
+        .header-logo span { color: var(--pulse-green); }
+        .location-badge { font-family: 'Space Mono'; font-size: 10px; color: var(--text-muted); background: var(--carbon-mid); padding: 4px 10px; border-radius: 12px; }
+
+        /* View Toggle */
+        .view-toggle { display: flex; background: var(--carbon-mid); border-radius: 8px; padding: 4px; }
+        .toggle-btn {
+            flex: 1; padding: 10px 16px; border: none; background: transparent;
+            color: var(--text-secondary); font-family: 'Space Mono'; font-size: 11px;
+            cursor: pointer; border-radius: 6px; transition: all 0.2s;
+        }
+        .toggle-btn.active { background: var(--pulse-green); color: var(--carbon-black); }
+
+        /* List View */
+        .list-container { padding: 16px 20px; flex: 1; overflow-y: auto; padding-bottom: 100px; }
+        .section-label { font-family: 'Space Mono'; font-size: 10px; color: var(--text-muted); letter-spacing: 2px; margin-bottom: 12px; display: flex; justify-content: space-between; }
+
+        .location-card {
+            background: var(--carbon-dark); border: 1px solid var(--carbon-mid); border-radius: 12px;
+            padding: 16px; margin-bottom: 12px; cursor: pointer; transition: all 0.2s; position: relative;
+        }
+        .location-card:hover { border-color: var(--pulse-green); transform: translateX(4px); }
+        .location-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; border-radius: 12px 0 0 12px; }
+        .location-card.good::before { background: var(--pulse-green); }
+        .location-card.medium::before { background: var(--pulse-yellow); }
+        .location-card.bad::before { background: var(--pulse-red); }
+
+        .card-header { display: flex; align-items: center; gap: 12px; }
+        .card-icon { width: 40px; height: 40px; background: var(--carbon-mid); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+        .card-info { flex: 1; min-width: 0; padding-right: 8px; }
+        .card-name { font-size: 15px; font-weight: 600; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .card-type { font-family: 'Space Mono'; font-size: 10px; color: var(--text-muted); }
+        .card-score-wrapper { display: flex; flex-direction: column; align-items: center; gap: 4px; flex-shrink: 0; }
+        .card-score { font-family: 'Space Mono'; font-size: 18px; font-weight: 700; }
+        .card-score.good { color: var(--pulse-green); }
+        .card-score.medium { color: var(--pulse-yellow); }
+        .card-score.bad { color: var(--pulse-red); }
+        .card-save-btn { background: none; border: none; font-size: 14px; cursor: pointer; padding: 2px; }
+        .card-footer { display: flex; justify-content: space-between; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--carbon-mid); }
+        .card-distance { font-family: 'Space Mono'; font-size: 11px; color: var(--text-muted); }
+        .card-tag { font-size: 11px; color: var(--text-secondary); background: var(--carbon-mid); padding: 3px 8px; border-radius: 4px; max-width: 140px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        /* Building Card */
+        .building-card {
+            background: var(--carbon-dark); border: 1px solid var(--carbon-mid); border-radius: 12px;
+            padding: 16px; margin-bottom: 12px; cursor: pointer; transition: all 0.2s; position: relative;
+        }
+        .building-card:hover { border-color: var(--pulse-blue); }
+        .building-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; border-radius: 12px 0 0 12px; background: var(--pulse-blue); }
+        .building-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+        .building-name { font-size: 15px; font-weight: 600; margin-bottom: 4px; padding-right: 60px; }
+        .building-meta { font-family: 'Space Mono'; font-size: 10px; color: var(--text-muted); }
+        .building-ec { text-align: right; }
+        .building-ec-wrapper { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+        .ec-value { font-family: 'Space Mono'; font-size: 18px; font-weight: 700; }
+        .ec-value.low { color: var(--pulse-green); }
+        .ec-value.medium { color: var(--pulse-yellow); }
+        .ec-value.high { color: var(--pulse-red); }
+        .ec-label { font-size: 9px; color: var(--text-muted); }
+        .building-save-btn { background: none; border: none; font-size: 14px; cursor: pointer; padding: 2px; margin-top: 4px; }
+        .building-footer { display: flex; gap: 8px; flex-wrap: wrap; }
+        .building-tag { font-size: 10px; color: var(--text-secondary); background: var(--carbon-mid); padding: 4px 8px; border-radius: 4px; }
+
+        /* My Reviews Screen */
+        .review-item {
+            background: var(--carbon-dark); border: 1px solid var(--carbon-mid); border-radius: 12px;
+            padding: 16px; margin-bottom: 12px; cursor: pointer;
+        }
+        .review-item-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+        .review-item-name { font-size: 15px; font-weight: 600; }
+        .review-item-meta { font-family: 'Space Mono'; font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+        .review-item-score { font-family: 'Space Mono'; font-size: 16px; font-weight: 700; }
+        .review-item-text { font-size: 13px; color: var(--text-secondary); line-height: 1.5; padding: 12px; background: var(--carbon-mid); border-radius: 8px; font-style: italic; }
+        .review-item-date { font-family: 'Space Mono'; font-size: 10px; color: var(--text-muted); margin-top: 8px; }
+
+        /* Pulse Screen */
+        .pulse-container { padding: 20px; flex: 1; overflow-y: auto; padding-bottom: 100px; }
+
+        .pulse-score-card {
+            background: linear-gradient(135deg, rgba(0,255,136,0.2) 0%, var(--carbon-dark) 100%);
+            border: 1px solid var(--pulse-green); border-radius: 20px;
+            padding: 32px 24px; text-align: center; margin-bottom: 24px;
+        }
+        .pulse-location { font-family: 'Space Mono'; font-size: 11px; color: var(--text-muted); margin-bottom: 8px; }
+        .pulse-score-big { font-family: 'Space Mono'; font-size: 80px; font-weight: 700; color: var(--pulse-green); line-height: 1; }
+        .pulse-score-label { font-size: 14px; color: var(--text-secondary); margin-top: 8px; }
+        .pulse-grade { display: inline-block; background: var(--pulse-green); color: var(--carbon-black); padding: 6px 16px; border-radius: 20px; font-weight: 700; font-size: 12px; margin-top: 12px; }
+
+        .pulse-section { margin-bottom: 24px; }
+        .pulse-section-title { font-family: 'Space Mono'; font-size: 10px; color: var(--text-muted); letter-spacing: 2px; margin-bottom: 12px; }
+
+        .pulse-breakdown { background: var(--carbon-dark); border: 1px solid var(--carbon-mid); border-radius: 12px; padding: 16px; margin-bottom: 16px; }
+        .breakdown-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; }
+        .breakdown-row:not(:last-child) { border-bottom: 1px solid var(--carbon-mid); }
+        .breakdown-label { font-size: 13px; color: var(--text-secondary); }
+        .breakdown-value { font-family: 'Space Mono'; font-size: 14px; font-weight: 700; }
+        .breakdown-value.good { color: var(--pulse-green); }
+        .breakdown-value.medium { color: var(--pulse-yellow); }
+        .breakdown-value.bad { color: var(--pulse-red); }
+
+        .pulse-bar-section { margin-bottom: 16px; }
+        .pulse-bar-label { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 6px; }
+        .pulse-bar { height: 8px; background: var(--carbon-mid); border-radius: 4px; overflow: hidden; }
+        .pulse-bar-fill { height: 100%; border-radius: 4px; transition: width 0.5s ease; }
+
+        .pulse-viz {
+            background: var(--carbon-dark); border: 1px solid var(--carbon-mid); border-radius: 12px;
+            padding: 20px; margin-bottom: 16px;
+        }
+        .viz-title { font-size: 13px; font-weight: 600; margin-bottom: 16px; text-align: center; }
+        .viz-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+        .viz-cell { aspect-ratio: 1; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; transition: transform 0.2s; }
+        .viz-cell:hover { transform: scale(1.1); }
+        .viz-cell.good { background: rgba(0,255,136,0.3); }
+        .viz-cell.medium { background: rgba(255,229,102,0.3); }
+        .viz-cell.bad { background: rgba(255,107,107,0.3); }
+        .viz-cell.building { background: rgba(102,217,255,0.2); }
+
+        .pulse-insight {
+            background: var(--carbon-dark); border-left: 3px solid var(--pulse-green);
+            padding: 16px; border-radius: 0 12px 12px 0; margin-bottom: 12px;
+        }
+        .insight-title { font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+        .insight-text { font-size: 12px; color: var(--text-secondary); line-height: 1.5; }
+
+        /* Profile Screens */
+        .profile-header-nav {
+            padding: 16px 20px; display: flex; align-items: center; justify-content: space-between;
+            border-bottom: 1px solid var(--carbon-mid); position: sticky; top: 0; background: var(--carbon-black); z-index: 100;
+        }
+        .back-btn {
+            width: 36px; height: 36px; border-radius: 50%; background: var(--carbon-mid);
+            border: none; color: var(--text-primary); font-size: 16px; cursor: pointer;
+        }
+        .back-btn:hover { background: var(--pulse-green); color: var(--carbon-black); }
+
+        .profile-hero { padding: 24px 20px; }
+        .profile-hero.good { background: linear-gradient(180deg, rgba(0,255,136,0.15) 0%, transparent 100%); }
+        .profile-hero.medium { background: linear-gradient(180deg, rgba(255,229,102,0.15) 0%, transparent 100%); }
+        .profile-hero.bad { background: linear-gradient(180deg, rgba(255,107,107,0.15) 0%, transparent 100%); }
+        .profile-hero.building { background: linear-gradient(180deg, rgba(102,217,255,0.15) 0%, transparent 100%); }
+
+        .profile-type { font-family: 'Space Mono'; font-size: 10px; color: var(--text-muted); letter-spacing: 2px; margin-bottom: 8px; }
+        .profile-title { font-size: 24px; font-weight: 800; margin-bottom: 12px; }
+        .profile-score-row { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+        .profile-score-big { font-family: 'Space Mono'; font-size: 42px; font-weight: 700; }
+        .profile-score-label { font-size: 12px; color: var(--text-secondary); }
+        .profile-meta { font-family: 'Space Mono'; font-size: 11px; color: var(--text-muted); }
+
+        .profile-content { padding: 20px; padding-bottom: 40px; }
+        .section-title { font-family: 'Space Mono'; font-size: 10px; color: var(--text-muted); letter-spacing: 2px; margin-bottom: 12px; margin-top: 20px; }
+        .section-title:first-child { margin-top: 0; }
+        .about-text { font-size: 14px; color: var(--text-secondary); line-height: 1.6; }
+
+        .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
+        .detail-item { background: var(--carbon-mid); padding: 10px 12px; border-radius: 8px; }
+        .detail-label { font-size: 9px; color: var(--text-muted); margin-bottom: 2px; font-family: 'Space Mono'; }
+        .detail-value { font-size: 12px; font-weight: 500; }
+
+        .impact-card { background: var(--carbon-dark); border-left: 4px solid; border-radius: 8px; padding: 16px; margin-top: 12px; }
+        .impact-card.good { border-color: var(--pulse-green); }
+        .impact-card.bad { border-color: var(--pulse-red); }
+        .impact-card.building { border-color: var(--pulse-blue); }
+        .impact-list { list-style: none; }
+        .impact-list li { font-size: 13px; color: var(--text-secondary); padding: 4px 0 4px 16px; position: relative; }
+        .impact-list li::before { content: '→'; position: absolute; left: 0; color: var(--pulse-green); }
+        .impact-card.bad .impact-list li::before { color: var(--pulse-red); }
+        .impact-card.building .impact-list li::before { color: var(--pulse-blue); }
+
+        .review-card { background: var(--carbon-dark); border: 1px solid var(--carbon-mid); border-radius: 10px; padding: 14px; margin-bottom: 10px; }
+        .review-header { display: flex; justify-content: space-between; margin-bottom: 6px; }
+        .reviewer { font-size: 13px; font-weight: 600; }
+        .review-score { font-family: 'Space Mono'; font-size: 12px; }
+        .review-score.good { color: var(--pulse-green); }
+        .review-score.medium { color: var(--pulse-yellow); }
+        .review-score.bad { color: var(--pulse-red); }
+        .review-text { font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
+
+        /* User Profile - Spotify Wrapped Style */
+        .user-hero { padding: 32px 20px; text-align: center; background: linear-gradient(180deg, rgba(0,255,136,0.1) 0%, transparent 100%); }
+        .user-avatar { width: 80px; height: 80px; border-radius: 50%; background: var(--carbon-mid); margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; font-size: 32px; border: 2px solid var(--pulse-green); }
+        .user-name { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+        .user-handle { font-family: 'Space Mono'; font-size: 12px; color: var(--text-muted); margin-bottom: 16px; }
+        .user-stats { display: flex; justify-content: center; gap: 32px; }
+        .user-stat { text-align: center; }
+        .user-stat-value { font-family: 'Space Mono'; font-size: 22px; font-weight: 700; color: var(--pulse-green); }
+        .user-stat-label { font-size: 10px; color: var(--text-muted); }
+
+        .wrapped-section { padding: 20px; padding-bottom: 100px; }
+        .wrapped-card {
+            background: linear-gradient(135deg, var(--carbon-dark) 0%, var(--carbon-mid) 100%);
+            border: 1px solid var(--carbon-light); border-radius: 16px;
+            padding: 20px; margin-bottom: 16px; text-align: center;
+        }
+        .wrapped-card.highlight { background: linear-gradient(135deg, rgba(0,255,136,0.2) 0%, var(--carbon-dark) 100%); border-color: var(--pulse-green); }
+        .wrapped-card.blue { background: linear-gradient(135deg, rgba(102,217,255,0.2) 0%, var(--carbon-dark) 100%); border-color: var(--pulse-blue); }
+        .wrapped-label { font-family: 'Space Mono'; font-size: 10px; color: var(--text-muted); letter-spacing: 2px; margin-bottom: 8px; }
+        .wrapped-big { font-size: 32px; font-weight: 800; line-height: 1.1; margin-bottom: 8px; }
+        .wrapped-big.green { color: var(--pulse-green); }
+        .wrapped-big.blue { color: var(--pulse-blue); }
+        .wrapped-big.yellow { color: var(--pulse-yellow); }
+        .wrapped-big.number { font-size: 56px; font-family: 'Space Mono'; }
+        .wrapped-sub { font-size: 14px; color: var(--text-secondary); }
+        .wrapped-emoji { font-size: 32px; margin-bottom: 8px; }
+
+        .wrapped-list { text-align: left; margin-top: 12px; }
+        .wrapped-list-item { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--carbon-mid); }
+        .wrapped-list-item:last-child { border-bottom: none; }
+        .wrapped-rank { font-family: 'Space Mono'; font-size: 14px; font-weight: 700; color: var(--pulse-green); width: 24px; }
+        .wrapped-list-name { flex: 1; font-size: 14px; }
+        .wrapped-list-score { font-family: 'Space Mono'; font-size: 12px; color: var(--text-muted); }
+
+        .persona-card {
+            background: linear-gradient(135deg, rgba(0,255,136,0.15) 0%, rgba(102,217,255,0.15) 100%);
+            border: 1px solid var(--pulse-green); border-radius: 16px;
+            padding: 24px; text-align: center; margin-bottom: 16px;
+        }
+        .persona-title { font-family: 'Space Mono'; font-size: 10px; color: var(--text-muted); letter-spacing: 2px; margin-bottom: 12px; }
+        .persona-name { font-size: 28px; font-weight: 800; color: var(--pulse-green); margin-bottom: 8px; }
+        .persona-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
+        .persona-traits { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 16px; }
+        .persona-trait { font-size: 11px; background: var(--carbon-mid); padding: 6px 12px; border-radius: 20px; color: var(--text-secondary); }
+
+        /* Empty State */
+        .empty-state { text-align: center; padding: 60px 40px; }
+        .empty-icon { font-size: 48px; margin-bottom: 16px; opacity: 0.5; }
+        .empty-title { font-size: 16px; font-weight: 600; margin-bottom: 8px; }
+        .empty-text { font-size: 13px; color: var(--text-secondary); }
+
+        /* Bottom Nav */
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+            width: 430px; max-width: 100%; background: var(--carbon-dark);
+            border-top: 1px solid var(--carbon-mid); display: flex; padding: 8px 16px;
+            padding-bottom: max(8px, env(safe-area-inset-bottom));
+        }
+        .nav-item { flex: 1; padding: 10px 8px; text-align: center; cursor: pointer; border-radius: 10px; position: relative; }
+        .nav-item:hover { background: var(--carbon-mid); }
+        .nav-item.active { background: rgba(0,255,136,0.1); }
+        .nav-item.active .nav-icon, .nav-item.active .nav-label { color: var(--pulse-green); }
+        .nav-icon { font-size: 18px; margin-bottom: 4px; color: var(--text-muted); }
+        .nav-label { font-family: 'Space Mono'; font-size: 9px; color: var(--text-muted); letter-spacing: 1px; }
+        .nav-badge {
+            position: absolute; top: 4px; right: 50%; transform: translateX(50%); margin-right: -10px;
+            background: var(--pulse-green); color: var(--carbon-black); font-size: 9px;
+            font-weight: 700; padding: 2px 5px; border-radius: 8px; min-width: 14px;
+        }
+
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Intro Screen -->
+        <div class="screen active" id="intro-screen">
+            <div class="intro-screen">
+                <div class="intro-hero">
+                    <div class="intro-logo"><div class="intro-logo-inner">C</div></div>
+                    <h1 class="intro-title">CARBON<span>PULSE</span></h1>
+                    <p class="intro-tagline">NEIGHBORHOOD CARBON TRANSPARENCY</p>
+                </div>
+
+                <div class="intro-content">
+                    <div class="intro-stats-row">
+                        <div class="intro-stat">
+                            <div class="intro-stat-row">
+                                <div class="intro-stat-number">40</div>
+                                <div class="intro-stat-pct">%</div>
+                            </div>
+                            <div class="intro-stat-label">of emissions from buildings</div>
+                        </div>
+                        <div class="intro-stat">
+                            <div class="intro-stat-row">
+                                <div class="intro-stat-number">57</div>
+                            </div>
+                            <div class="intro-stat-label">companies → 80% of CO₂</div>
+                        </div>
+                    </div>
+
+                    <div class="intro-text">
+                        For decades, climate responsibility has been pushed onto individuals. But <strong>100 companies have produced 71% of emissions since 1988.</strong> The concrete in your apartment matters more than your reusable straw.
+                    </div>
+
+                    <div class="intro-points">
+                        <div class="intro-point">
+                            <div class="intro-point-title">🏛️ Buildings</div>
+                            <div class="intro-point-desc">Embodied carbon in materials, construction, age</div>
+                        </div>
+                        <div class="intro-point">
+                            <div class="intro-point-title">🏪 Businesses</div>
+                            <div class="intro-point-desc">Waste practices, supply chain, sourcing</div>
+                        </div>
+                    </div>
+
+                    <div class="intro-text">
+                        Carbon Pulse makes the invisible visible. Hold corporations and developers accountable. <strong>Transparency is the first step.</strong>
+                    </div>
+                </div>
+
+                <div class="intro-cta">
+                    <button class="btn-primary" onclick="showExplore()">ENTER</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Explore Screen -->
+        <div class="screen" id="explore-screen">
+            <div class="header">
+                <div class="header-top">
+                    <div class="header-logo">CARBON<span>PULSE</span></div>
+                    <div class="location-badge">📍 Avery Hall</div>
+                </div>
+                <div class="view-toggle">
+                    <button class="toggle-btn active" id="biz-toggle" onclick="setExploreView('businesses')">🏪 BUSINESSES</button>
+                    <button class="toggle-btn" id="bldg-toggle" onclick="setExploreView('buildings')">🏛️ BUILDINGS</button>
+                </div>
+            </div>
+
+            <div class="list-container" id="explore-list"></div>
+
+            <div class="bottom-nav">
+                <div class="nav-item active" onclick="showExplore()">
+                    <div class="nav-icon">🔍</div>
+                    <div class="nav-label">EXPLORE</div>
+                </div>
+                <div class="nav-item" onclick="showPulse()">
+                    <div class="nav-icon">⚡</div>
+                    <div class="nav-label">PULSE</div>
+                </div>
+                <div class="nav-item" onclick="showReviews()">
+                    <div class="nav-icon">✍️</div>
+                    <div class="nav-label">REVIEWS</div>
+                </div>
+                <div class="nav-item" onclick="showUserProfile()">
+                    <div class="nav-icon">👤</div>
+                    <div class="nav-label">PROFILE</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pulse Screen -->
+        <div class="screen" id="pulse-screen">
+            <div class="header">
+                <div class="header-top">
+                    <div class="header-logo">CARBON<span>PULSE</span></div>
+                    <div class="location-badge">📍 Avery Hall</div>
+                </div>
+            </div>
+
+            <div class="pulse-container">
+                <div class="pulse-score-card">
+                    <div class="pulse-location">500M RADIUS • MORNINGSIDE HEIGHTS</div>
+                    <div class="pulse-score-big" id="overall-score">3.4</div>
+                    <div class="pulse-score-label">Overall Carbon Score</div>
+                    <div class="pulse-grade" id="overall-grade">MODERATE IMPACT</div>
+                </div>
+
+                <div class="pulse-section">
+                    <div class="pulse-section-title">SCORE BREAKDOWN</div>
+                    <div class="pulse-breakdown">
+                        <div class="breakdown-row">
+                            <span class="breakdown-label">Business Practices</span>
+                            <span class="breakdown-value good" id="biz-score">3.7</span>
+                        </div>
+                        <div class="breakdown-row">
+                            <span class="breakdown-label">Building Embodied Carbon</span>
+                            <span class="breakdown-value medium" id="bldg-score">3.1</span>
+                        </div>
+                        <div class="breakdown-row">
+                            <span class="breakdown-label">Excellent Performers</span>
+                            <span class="breakdown-value" id="excellent-count">4</span>
+                        </div>
+                        <div class="breakdown-row">
+                            <span class="breakdown-label">Needs Improvement</span>
+                            <span class="breakdown-value" id="poor-count">3</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pulse-section">
+                    <div class="pulse-section-title">BUSINESS CARBON DISTRIBUTION</div>
+                    <div class="pulse-bar-section">
+                        <div class="pulse-bar-label">
+                            <span style="color:var(--pulse-green)">● Low Impact</span>
+                            <span id="biz-good-pct">40%</span>
+                        </div>
+                        <div class="pulse-bar"><div class="pulse-bar-fill" id="biz-good-bar" style="width:40%;background:var(--pulse-green)"></div></div>
+                    </div>
+                    <div class="pulse-bar-section">
+                        <div class="pulse-bar-label">
+                            <span style="color:var(--pulse-yellow)">● Moderate</span>
+                            <span id="biz-med-pct">30%</span>
+                        </div>
+                        <div class="pulse-bar"><div class="pulse-bar-fill" id="biz-med-bar" style="width:30%;background:var(--pulse-yellow)"></div></div>
+                    </div>
+                    <div class="pulse-bar-section">
+                        <div class="pulse-bar-label">
+                            <span style="color:var(--pulse-red)">● High Impact</span>
+                            <span id="biz-bad-pct">30%</span>
+                        </div>
+                        <div class="pulse-bar"><div class="pulse-bar-fill" id="biz-bad-bar" style="width:30%;background:var(--pulse-red)"></div></div>
+                    </div>
+                </div>
+
+                <div class="pulse-section">
+                    <div class="pulse-section-title">NEIGHBORHOOD MAP</div>
+                    <div class="pulse-viz">
+                        <div class="viz-title">Tap to explore</div>
+                        <div class="viz-grid" id="viz-grid"></div>
+                    </div>
+                </div>
+
+                <div class="pulse-section">
+                    <div class="pulse-section-title">INSIGHTS</div>
+                    <div class="pulse-insight">
+                        <div class="insight-title">🏆 Best Performer</div>
+                        <div class="insight-text">Hungarian Pastry Shop leads with a 4.8 score—zero single-use cups, all reusable dishware, local sourcing.</div>
+                    </div>
+                    <div class="pulse-insight" style="border-color:var(--pulse-blue)">
+                        <div class="insight-title">🏛️ Historic Advantage</div>
+                        <div class="insight-text">McKim, Mead & White buildings (1897-1912) score well due to longevity—100+ years of use amortizes embodied carbon.</div>
+                    </div>
+                    <div class="pulse-insight" style="border-color:var(--pulse-red)">
+                        <div class="insight-title">⚠️ Concern</div>
+                        <div class="insight-text">3 businesses score below 3.0, primarily due to single-use packaging and global supply chains.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bottom-nav">
+                <div class="nav-item" onclick="showExplore()">
+                    <div class="nav-icon">🔍</div>
+                    <div class="nav-label">EXPLORE</div>
+                </div>
+                <div class="nav-item active" onclick="showPulse()">
+                    <div class="nav-icon">⚡</div>
+                    <div class="nav-label">PULSE</div>
+                </div>
+                <div class="nav-item" onclick="showReviews()">
+                    <div class="nav-icon">✍️</div>
+                    <div class="nav-label">REVIEWS</div>
+                </div>
+                <div class="nav-item" onclick="showUserProfile()">
+                    <div class="nav-icon">👤</div>
+                    <div class="nav-label">PROFILE</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- My Reviews Screen -->
+        <div class="screen" id="reviews-screen">
+            <div class="header">
+                <div class="header-top">
+                    <div class="header-logo">MY<span>REVIEWS</span></div>
+                </div>
+            </div>
+            <div class="list-container" id="reviews-list"></div>
+            <div class="bottom-nav">
+                <div class="nav-item" onclick="showExplore()">
+                    <div class="nav-icon">🔍</div>
+                    <div class="nav-label">EXPLORE</div>
+                </div>
+                <div class="nav-item" onclick="showPulse()">
+                    <div class="nav-icon">⚡</div>
+                    <div class="nav-label">PULSE</div>
+                </div>
+                <div class="nav-item active" onclick="showReviews()">
+                    <div class="nav-icon">✍️</div>
+                    <div class="nav-label">REVIEWS</div>
+                </div>
+                <div class="nav-item" onclick="showUserProfile()">
+                    <div class="nav-icon">👤</div>
+                    <div class="nav-label">PROFILE</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- User Profile Screen -->
+        <div class="screen" id="user-screen">
+            <div class="header">
+                <div class="header-top">
+                    <div class="header-logo">YOUR<span>PULSE</span></div>
+                </div>
+            </div>
+            <div class="user-hero">
+                <div class="user-avatar">🌱</div>
+                <div class="user-name">Kel Donovan</div>
+                <div class="user-handle">@carbon_architect</div>
+                <div class="user-stats">
+                    <div class="user-stat">
+                        <div class="user-stat-value" id="biz-reviewed-count">4</div>
+                        <div class="user-stat-label">SPOTS</div>
+                    </div>
+                    <div class="user-stat">
+                        <div class="user-stat-value" id="bldg-reviewed-count">3</div>
+                        <div class="user-stat-label">BUILDINGS</div>
+                    </div>
+                    <div class="user-stat">
+                        <div class="user-stat-value">7</div>
+                        <div class="user-stat-label">REVIEWS</div>
+                    </div>
+                </div>
+            </div>
+            <div class="wrapped-section">
+                <div class="persona-card">
+                    <div class="persona-title">YOUR CARBON PERSONA</div>
+                    <div class="persona-name">🏛️ The Preservationist</div>
+                    <div class="persona-desc">You value longevity over novelty. Historic buildings and independent businesses speak to you.</div>
+                    <div class="persona-traits">
+                        <span class="persona-trait">Landmark Lover</span>
+                        <span class="persona-trait">Local First</span>
+                        <span class="persona-trait">Anti-Chain</span>
+                    </div>
+                </div>
+
+                <div class="wrapped-card highlight">
+                    <div class="wrapped-label">YOUR TOP SPOT</div>
+                    <div class="wrapped-emoji">☕</div>
+                    <div class="wrapped-big green">Hungarian Pastry Shop</div>
+                    <div class="wrapped-sub">You gave it a 4.9 — your highest rating</div>
+                </div>
+
+                <div class="wrapped-card blue">
+                    <div class="wrapped-label">FAVORITE BUILDING</div>
+                    <div class="wrapped-emoji">🏛️</div>
+                    <div class="wrapped-big blue">Low Memorial Library</div>
+                    <div class="wrapped-sub">McKim, Mead & White — you have good taste</div>
+                </div>
+
+                <div class="wrapped-card">
+                    <div class="wrapped-label">AVERAGE SCORE YOU GIVE</div>
+                    <div class="wrapped-big number yellow">4.1</div>
+                    <div class="wrapped-sub">You're a generous but honest critic</div>
+                </div>
+
+                <div class="wrapped-card">
+                    <div class="wrapped-label">YOUR TOP CATEGORIES</div>
+                    <div class="wrapped-list">
+                        <div class="wrapped-list-item">
+                            <span class="wrapped-rank">1</span>
+                            <span class="wrapped-list-name">☕ Cafés</span>
+                            <span class="wrapped-list-score">3 visited</span>
+                        </div>
+                        <div class="wrapped-list-item">
+                            <span class="wrapped-rank">2</span>
+                            <span class="wrapped-list-name">🏛️ Historic (pre-1940)</span>
+                            <span class="wrapped-list-score">2 visited</span>
+                        </div>
+                        <div class="wrapped-list-item">
+                            <span class="wrapped-rank">3</span>
+                            <span class="wrapped-list-name">📚 Independent Shops</span>
+                            <span class="wrapped-list-score">1 visited</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="wrapped-card">
+                    <div class="wrapped-label">BUILDINGS BY ERA</div>
+                    <div class="wrapped-list">
+                        <div class="wrapped-list-item">
+                            <span class="wrapped-rank">🏆</span>
+                            <span class="wrapped-list-name">Beaux-Arts (1890-1920)</span>
+                            <span class="wrapped-list-score">2 buildings</span>
+                        </div>
+                        <div class="wrapped-list-item">
+                            <span class="wrapped-rank">2</span>
+                            <span class="wrapped-list-name">Modernist (1950-1980)</span>
+                            <span class="wrapped-list-score">1 building</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="wrapped-card highlight">
+                    <div class="wrapped-label">CARBON IMPACT</div>
+                    <div class="wrapped-big number green">-12%</div>
+                    <div class="wrapped-sub">Your reviewed spots average 12% lower carbon than neighborhood average</div>
+                </div>
+            </div>
+            <div class="bottom-nav">
+                <div class="nav-item" onclick="showExplore()">
+                    <div class="nav-icon">🔍</div>
+                    <div class="nav-label">EXPLORE</div>
+                </div>
+                <div class="nav-item" onclick="showPulse()">
+                    <div class="nav-icon">⚡</div>
+                    <div class="nav-label">PULSE</div>
+                </div>
+                <div class="nav-item" onclick="showReviews()">
+                    <div class="nav-icon">✍️</div>
+                    <div class="nav-label">REVIEWS</div>
+                </div>
+                <div class="nav-item active" onclick="showUserProfile()">
+                    <div class="nav-icon">👤</div>
+                    <div class="nav-label">PROFILE</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Detail container -->
+        <div id="detail-container"></div>
+    </div>
+
+    <script>
+        // 10 BUSINESSES
+        const businesses = [
+            { id: 'hungarian-pastry', name: 'Hungarian Pastry Shop', type: 'CAFÉ', icon: '☕', score: 4.8, distance: '0.2 mi', tag: 'No WiFi, No Waste', about: 'A Morningside Heights institution since the 1960s. Old-world European café with specialty coffees and Eastern European desserts. No WiFi, no single-use cups.', impact: ['Reusable dishware only', 'Locally sourced pastries', 'Zero single-use cups', 'Cash-only reduces processing'], reviews: [{ user: '@lowcarbonliz', score: 5.0, text: 'My favorite spot to write. Cherry strudel is incredible.' }, { user: '@gsapp_marcus', score: 4.8, text: 'Perfect for post-studio decompression.' }] },
+            { id: 'community-food', name: 'Community Food & Juice', type: 'RESTAURANT', icon: '🥗', score: 4.5, distance: '0.3 mi', tag: 'Farm-to-Table', about: 'Seasonal, local, and organic food with a vegetarian focus. Legendary pancakes and group-friendly space.', impact: ['Sources from local farms', 'Seasonal rotating menu', 'Compostable containers', 'Vegetarian-forward'], reviews: [{ user: '@brunch_brigade', score: 4.7, text: 'The brioche french toast changed my life.' }, { user: '@plantbased_pete', score: 4.5, text: 'Finally a place that takes vegetarian seriously.' }] },
+            { id: 'book-culture', name: 'Book Culture', type: 'BOOKSTORE', icon: '📚', score: 4.2, distance: '0.4 mi', tag: 'Independent & Used', about: 'Independent bookstore with new and used books. A neighborhood treasure and sustainable alternative to Amazon.', impact: ['Sells used books', 'Local independent business', 'Community events', 'No shipping emissions'], reviews: [{ user: '@readmorebooks', score: 4.5, text: 'The used architecture section is a goldmine.' }, { user: '@analog_andrea', score: 4.0, text: 'Supporting indie bookstores > Prime delivery.' }] },
+            { id: 'joe-coffee', name: 'Joe Coffee', type: 'CAFÉ', icon: '☕', score: 4.0, distance: '0.1 mi', tag: 'Local Roaster', about: 'NYC-based specialty coffee roaster with campus locations. Reusable cup discounts and fair trade sourcing.', impact: ['Reusable cup discounts', 'Locally roasted', 'Fair trade beans', 'Campus walkability'], reviews: [{ user: '@caffeine_scholar', score: 4.2, text: 'Best espresso on campus, hands down.' }, { user: '@earlybird_emma', score: 3.8, text: 'The NWC location is my morning ritual.' }] },
+            { id: 'toms-restaurant', name: "Tom's Restaurant", type: 'DINER', icon: '🍽️', score: 3.5, distance: '0.3 mi', tag: 'Seinfeld Famous', about: 'The iconic diner from Seinfeld. Classic diner fare serving Columbia forever. Institution > innovation.', impact: ['Reusable dishware', 'Long-standing local business', 'Walkable', 'Community gathering'], reviews: [{ user: '@90s_nostalgia', score: 3.8, text: 'Had to do the tourist thing once.' }, { user: '@late_night_studio', score: 3.5, text: 'Open late during finals.' }] },
+            { id: 'sweetgreen', name: 'Sweetgreen', type: 'FAST CASUAL', icon: '🥬', score: 3.4, distance: '0.4 mi', tag: 'Chain but Local-ish', about: 'Salad chain with local sourcing claims. Better than most fast casual but still corporate supply chain.', impact: ['Some local sourcing', 'Compostable bowls', 'Corporate supply chain', 'High rent = high pressure'], reviews: [{ user: '@salad_skeptic', score: 3.2, text: 'Fine for a quick lunch but overpriced.' }, { user: '@health_conscious', score: 3.6, text: 'At least they try with the local farms thing.' }] },
+            { id: 'morton-williams', name: 'Morton Williams', type: 'GROCERY', icon: '🛒', score: 3.2, distance: '0.2 mi', tag: 'Convenient but Plastic', about: 'Campus-adjacent grocery. Convenient but heavy on packaging and limited bulk options.', impact: ['Walkable location', 'Reusable bag discount', 'Heavy plastic packaging', 'Some local produce'], reviews: [{ user: '@convenience_kai', score: 3.4, text: 'It is what it is. Close to campus.' }, { user: '@zerowaste_wannabe', score: 3.0, text: 'So much plastic. Bring your own everything.' }] },
+            { id: 'starbucks', name: 'Starbucks', type: 'COFFEE CHAIN', icon: '☕', score: 2.2, distance: '0.3 mi', tag: 'Single-Use Heavy', about: 'Global coffee chain. Convenient but 99% single-use cups despite greenwashing campaigns.', impact: ['99% disposable cups', 'Global supply chain', 'High dairy consumption', 'Plastic everything'], reviews: [{ user: '@guilty_caffeine', score: 2.5, text: 'Sometimes you just need wifi and a bathroom.' }, { user: '@zerowaste_zoe', score: 1.8, text: 'Bring your own cup and they still give you a straw.' }] },
+            { id: 'dunkin', name: "Dunkin'", type: 'COFFEE CHAIN', icon: '🍩', score: 2.0, distance: '0.5 mi', tag: 'Styrofoam Era', about: 'Fast coffee and donuts. Still using foam cups in some locations. Peak disposable culture.', impact: ['Foam cups persist', 'Global supply chain', 'Sugar-industrial complex', 'Zero sustainability effort'], reviews: [{ user: '@donut_defender', score: 2.2, text: 'Cheap coffee, expensive planet.' }, { user: '@morning_rush', score: 1.8, text: 'Ashamed every time but desperate.' }] },
+            { id: 'chipotle', name: 'Chipotle', type: 'FAST CASUAL', icon: '🌯', score: 2.8, distance: '0.4 mi', tag: 'Mixed Signals', about: 'Fast casual Mexican with some responsible sourcing but heavy on packaging and napkins.', impact: ['Some responsible sourcing', 'Aluminum bowl option', 'Excessive napkin waste', 'Corporate supply chain'], reviews: [{ user: '@burrito_brian', score: 3.0, text: 'At least the bowl is recyclable?' }, { user: '@packaging_police', score: 2.6, text: 'Why do they give 47 napkins per order.' }] },
+            { id: 'milano-market', name: 'Milano Market', type: 'DELI', icon: '🥪', score: 4.4, distance: '0.2 mi', tag: 'Local Institution', about: 'Beloved neighborhood deli since 1987. Legendary sandwiches, family-owned, supplies local ingredients. The Columbia sandwich spot.', impact: ['Family-owned 35+ years', 'Local supplier relationships', 'Minimal packaging', 'Walkable neighborhood staple'], reviews: [{ user: '@sandwich_scholar', score: 4.6, text: 'The Stefano is perfect. No notes.' }, { user: '@local_loyalist', score: 4.2, text: 'Family-owned beats Sweetgreen every time.' }] },
+            { id: 'koronet-pizza', name: 'Koronet Pizza', type: 'PIZZERIA', icon: '🍕', score: 3.8, distance: '0.3 mi', tag: 'Giant Slice Institution', about: 'Home of the famous $5 giant slice. Serving Columbia students since 1981. No-frills, high-volume, late-night essential.', impact: ['Cash-friendly operations', 'Minimal packaging (paper plates)', 'Local institution 40+ years', 'High-volume = less waste per serving'], reviews: [{ user: '@late_night_slice', score: 4.0, text: 'The 2am slice hits different after studio.' }, { user: '@pizza_pragmatist', score: 3.6, text: 'Not the best pizza, but the best value.' }] },
+            { id: 'absolute-bagels', name: 'Absolute Bagels', type: 'BAKERY', icon: '🥯', score: 4.3, distance: '0.5 mi', tag: 'Hand-Rolled Daily', about: 'Hand-rolled, kettle-boiled bagels made fresh daily. Cash-only, no-frills. Rivals any bagel in the city.', impact: ['Fresh daily = less waste', 'Cash-only operations', 'Minimal packaging', 'Local cult following'], reviews: [{ user: '@bagel_believer', score: 4.5, text: 'The everything with scallion cream cheese is transcendent.' }, { user: '@carb_critic', score: 4.1, text: 'Worth the walk to Broadway. Real NYC bagels.' }] }
+        ];
+
+        // 13 BUILDINGS
+        const buildings = [
+            { id: 'avery-hall', name: 'Avery Hall', address: '1172 Amsterdam Ave', yearBuilt: 1912, architect: 'McKim, Mead & White', materials: 'Brick, Limestone, Steel', grossArea: '105,370 sq ft', stories: 8, ec: 285, ecRating: 'medium', about: 'Renaissance Revival building housing GSAPP and Avery Library. Designed by Charles Follen McKim—first library to leave Low.', impact: ['Heavy masonry stores carbon long-term', '110+ years continuous use', 'Historic preservation value', 'Steel frame typical of era'], reviews: [{ user: '@gsapp_student', score: 4.0, text: 'Home sweet home.' }, { user: '@preservation_pat', score: 4.5, text: 'McKim\'s proportions are perfect.' }] },
+            { id: 'low-library', name: 'Low Memorial Library', address: '535 W 116th St', yearBuilt: 1897, architect: 'McKim, Mead & White', materials: 'Granite, Limestone, Brick dome', grossArea: '95,000 sq ft', stories: 4, ec: 320, ecRating: 'medium', about: 'Iconic neoclassical centerpiece. Brick dome, not marble. Now houses administration.', impact: ['Granite base extremely durable', 'Brick dome lighter than stone', 'Adaptive reuse from library', '125+ years continuous use'], reviews: [{ user: '@architecture_nerd', score: 5.0, text: 'The Rotunda is one of NYC\'s great interiors.' }, { user: '@campus_historian', score: 4.8, text: 'McKim wanted marble but Low insisted on brick.' }] },
+            { id: 'butler-library', name: 'Butler Library', address: '535 W 114th St', yearBuilt: 1934, architect: 'James Gamble Rogers', materials: 'Brick (Flemish bond), Limestone, Copper', grossArea: '362,000 sq ft', stories: 10, ec: 295, ecRating: 'medium', about: 'Columbia\'s largest library with 2M+ volumes. Rogers matched McKim\'s style despite preferring Gothic.', impact: ['Flemish bond = durable, repairable', 'Copper roof 100+ year lifespan', '90 years continuous use', 'Recent renovations extend life'], reviews: [{ user: '@library_lover', score: 4.5, text: 'Room 209 is sacred space.' }, { user: '@materials_nerd', score: 4.2, text: 'That Flemish bond brickwork is exceptional.' }] },
+            { id: 'st-john-divine', name: 'Cathedral of St. John the Divine', address: '1047 Amsterdam Ave', yearBuilt: 1892, architect: 'Heins & LaFarge / Cram', materials: 'Granite, Limestone, Guastavino tile', grossArea: '121,000 sq ft', stories: 'Nave 124ft', ec: 380, ecRating: 'medium', about: 'Largest Gothic cathedral in the world (unfinished). Stone construction stores carbon for centuries.', impact: ['Stone stores carbon indefinitely', 'Traditional construction methods', 'Unfinished = less material used', 'Community programs offset operations'], reviews: [{ user: '@gothic_enthusiast', score: 5.0, text: 'The scale is incomprehensible in person.' }, { user: '@carbon_accountant', score: 4.2, text: 'Stone buildings are long-term carbon storage.' }] },
+            { id: 'nwc-building', name: 'Northwest Corner Building', address: '550 W 120th St', yearBuilt: 2010, architect: 'Rafael Moneo', materials: 'Steel, Aluminum, Glass, Granite', grossArea: '188,000 sq ft', stories: 14, ec: 380, ecRating: 'medium', about: 'LEED Gold science building cantilevered over Levien Gym. Diagonal trusses span 125 feet.', impact: ['LEED Gold certified', 'Built over existing gym', 'Aluminum = high embodied carbon', 'Heat recovery reduces operations'], reviews: [{ user: '@leed_expert', score: 4.2, text: 'Finally real sustainability creds.' }, { user: '@brutalism_fan', score: 3.8, text: 'Moneo found contextual AND contemporary.' }] },
+            { id: 'lerner-hall', name: 'Alfred Lerner Hall', address: '2920 Broadway', yearBuilt: 1999, architect: 'Bernard Tschumi', materials: 'Steel, Glass curtain wall, Brick', grossArea: '250,586 sq ft', stories: 10, ec: 425, ecRating: 'high', about: 'Deconstructivist student center with controversial glass ramps. Glass facade by Eiffel Constructions.', impact: ['High-embodied carbon glass', 'Steel ramps = significant material', 'Replaced Ferris Booth (demo waste)', 'Energy-intensive glass atrium'], reviews: [{ user: '@tschumi_fan', score: 3.5, text: 'Love it or hate it, it\'s a statement.' }, { user: '@energy_auditor', score: 2.8, text: 'That glass wall is a thermal nightmare.' }] },
+            { id: 'mudd-building', name: 'Seeley W. Mudd Building', address: '500 W 120th St', yearBuilt: 1961, architect: 'Voorhees Walker Foley Smith', materials: 'Concrete, Glass, Steel', grossArea: '180,000 sq ft', stories: 14, ec: 450, ecRating: 'high', about: 'Engineering building. Brutalist-adjacent. Called a "glorified cinder block" since construction.', impact: ['Concrete = high embodied carbon', '1960s HVAC inefficiency', 'No contextual response to McKim', 'Functional but not beautiful'], reviews: [{ user: '@engineering_eli', score: 2.5, text: 'It works. That\'s about it.' }, { user: '@brutalism_apologist', score: 3.0, text: 'At least it\'s honest about being ugly.' }] },
+            { id: 'uris-hall', name: 'Uris Hall', address: '3022 Broadway', yearBuilt: 1964, architect: 'Moore & Hutchins', materials: 'Concrete, Brick, Glass', grossArea: '140,000 sq ft', stories: 8, ec: 420, ecRating: 'high', about: 'Business school building. 1960s institutional style that ignored McKim\'s campus vision.', impact: ['Concrete-heavy construction', 'Poor thermal performance', 'Ignored campus context', 'Renovation could improve'], reviews: [{ user: '@b_school_critic', score: 2.8, text: 'They teach sustainability here, ironically.' }, { user: '@campus_planner', score: 2.5, text: 'Peak 1960s institutional mediocrity.' }] },
+            { id: 'riverside-church', name: 'Riverside Church', address: '490 Riverside Dr', yearBuilt: 1930, architect: 'Allen & Collens / Pelton', materials: 'Indiana Limestone, Steel frame', grossArea: '120,000 sq ft', stories: '22 (tower 392ft)', ec: 340, ecRating: 'medium', about: 'Neo-Gothic church with 74-bell carillon. Funded by Rockefeller Jr. Inspired by Chartres.', impact: ['Limestone is durable', 'Steel frame hidden inside', 'Community programs active', '95 years continuous use'], reviews: [{ user: '@carillon_fan', score: 4.8, text: 'The bells are magical on Sunday.' }, { user: '@harlem_historian', score: 4.5, text: 'A civic monument, not just a church.' }] },
+            { id: 'schapiro-cepsr', name: 'Schapiro CEPSR', address: '530 W 120th St', yearBuilt: 1992, architect: 'Hellmuth Obata Kassabaum', materials: 'Limestone, Brick, Steel', grossArea: '220,000 sq ft', stories: 8, ec: 350, ecRating: 'medium', about: 'Engineering research center. Attempted to match McKim with limestone facade and Harvard brick.', impact: ['Contextual materials choice', 'Limestone facade = longevity', 'Better than Mudd attempt', '30+ years of use'], reviews: [{ user: '@context_respecter', score: 3.8, text: 'At least they tried to fit in.' }, { user: '@engineering_alum', score: 3.5, text: 'Functional and not offensive. A win.' }] },
+            { id: 'apollo-theater', name: 'Apollo Theater', address: '253 W 125th St', yearBuilt: 1914, architect: 'George Keister', materials: 'Brick, Terra Cotta, Steel', grossArea: '55,000 sq ft', stories: 3, ec: 290, ecRating: 'medium', about: 'Neo-Classical landmark and soul of Harlem. Originally a burlesque theater, became the most famous Black performance venue in America. Amateur Night since 1934.', impact: ['110+ years continuous use', 'Terra cotta facade durable', 'Cultural preservation value', 'Community anchor'], reviews: [{ user: '@harlem_native', score: 5.0, text: 'Sacred ground. Ella, James Brown, everyone started here.' }, { user: '@preservation_advocate', score: 4.8, text: 'The facade restoration was done right.' }] },
+            { id: 'the-ansonia', name: 'The Ansonia', address: '2109 Broadway', yearBuilt: 1904, architect: 'Graves & Duboy', materials: 'Brick, Limestone, Terra Cotta, Steel', grossArea: '350,000 sq ft', stories: 17, ec: 310, ecRating: 'medium', about: 'Beaux-Arts residential landmark. Originally had rooftop farm, swimming pool, and live seals in lobby fountain. Now luxury condos. Babe Ruth and Stravinsky lived here.', impact: ['120+ years continuous use', 'Massive thermal mass', 'Adaptive reuse over time', 'Ornate terra cotta = embodied craft'], reviews: [{ user: '@uws_historian', score: 4.7, text: 'The most eccentric building in Manhattan. Rooftop farm in 1904!' }, { user: '@beaux_arts_fan', score: 4.5, text: 'That facade is absolutely unhinged. I love it.' }] },
+            { id: 'union-theological', name: 'Union Theological Seminary', address: '3041 Broadway', yearBuilt: 1910, architect: 'Allen & Collens', materials: 'Manhattan Schist, Granite, Limestone', grossArea: '180,000 sq ft', stories: 6, ec: 335, ecRating: 'medium', about: 'Collegiate Gothic campus built from local Manhattan schist. Connected to Columbia but independent. James Tower is 220 feet tall.', impact: ['Local stone = low transport emissions', 'Gothic quad design = passive ventilation', '115 years continuous use', 'Stone construction = carbon storage'], reviews: [{ user: '@gothic_scholar', score: 4.6, text: 'The quad feels like Oxford dropped into Morningside.' }, { user: '@stone_appreciator', score: 4.3, text: 'Manhattan schist is the most honest NYC material.' }] }
+        ];
+
+        // User's reviews (Kel's reviews)
+        const myReviews = [
+            { placeId: 'hungarian-pastry', type: 'business', score: 4.9, text: 'The perfect thesis writing spot. No wifi forces focus. The dobos torte is worth the walk in any weather. Been coming here since first year.', date: '2025-11-15' },
+            { placeId: 'community-food', type: 'business', score: 4.3, text: 'Great for studio group dinners. The pancakes are legendary but the carbon story is even better—real farm-to-table, not just marketing.', date: '2025-10-28' },
+            { placeId: 'book-culture', type: 'business', score: 4.5, text: 'Found a first edition Venturi here for $12. The used architecture section alone is worth supporting indie bookstores.', date: '2025-09-20' },
+            { placeId: 'joe-coffee', type: 'business', score: 3.8, text: 'Reliable espresso between studios. They actually honor the reusable cup discount unlike some chains. NWC location is my go-to.', date: '2025-11-01' },
+            { placeId: 'low-library', type: 'building', score: 5.0, text: "McKim understood something about civic architecture that we've lost. The Rotunda is transcendent. The brick dome detail is chef's kiss.", date: '2025-10-05' },
+            { placeId: 'avery-hall', type: 'building', score: 4.2, text: 'Home. The proportions of the reading room are perfect for long research sessions. 112 years of continuous use is the best sustainability metric.', date: '2025-08-30' },
+            { placeId: 'lerner-hall', type: 'building', score: 2.9, text: "Controversial take: I appreciate Tschumi's ambition but the thermal performance is inexcusable. That glass wall is an energy disaster. Form over function.", date: '2025-09-15' }
+        ];
+
+        let exploreView = 'businesses';
+
+        function getScoreClass(score) {
+            if (score >= 4.0) return 'good';
+            if (score >= 3.0) return 'medium';
+            return 'bad';
+        }
+
+        function getECClass(rating) {
+            return rating === 'low' ? 'low' : rating === 'medium' ? 'medium' : 'high';
+        }
+
+        function renderExploreList() {
+            const list = document.getElementById('explore-list');
+            if (exploreView === 'businesses') {
+                const sorted = [...businesses].sort((a, b) => b.score - a.score);
+                list.innerHTML = `<div class="section-label"><span>13 BUSINESSES</span><span>BY CARBON SCORE</span></div>` +
+                    sorted.map(b => `
+                        <div class="location-card ${getScoreClass(b.score)}" onclick="showBusinessDetail('${b.id}')">
+                            <div class="card-header">
+                                <div class="card-icon">${b.icon}</div>
+                                <div class="card-info">
+                                    <div class="card-name">${b.name}</div>
+                                    <div class="card-type">${b.type}</div>
+                                </div>
+                                <div class="card-score-wrapper">
+                                    <div class="card-score ${getScoreClass(b.score)}">${b.score.toFixed(1)}</div>
+                                </div>
+                            </div>
+                            <div class="card-footer">
+                                <div class="card-distance">${b.distance}</div>
+                                <div class="card-tag">${b.tag}</div>
+                            </div>
+                        </div>
+                    `).join('');
+            } else {
+                const sorted = [...buildings].sort((a, b) => a.ec - b.ec);
+                list.innerHTML = `<div class="section-label"><span>13 BUILDINGS</span><span>BY EMBODIED CARBON</span></div>` +
+                    sorted.map(b => `
+                        <div class="building-card" onclick="showBuildingDetail('${b.id}')">
+                            <div class="building-header">
+                                <div>
+                                    <div class="building-name">${b.name}</div>
+                                    <div class="building-meta">${b.yearBuilt} • ${b.architect.split(' /')[0]}</div>
+                                </div>
+                                <div class="building-ec">
+                                    <div class="ec-value ${getECClass(b.ecRating)}">${b.ec}</div>
+                                    <div class="ec-label">kg CO₂e/m²</div>
+                                </div>
+                            </div>
+                            <div class="building-footer">
+                                <div class="building-tag">${b.materials.split(',')[0]}</div>
+                                <div class="building-tag">${b.stories} stories</div>
+                            </div>
+                        </div>
+                    `).join('');
+            }
+        }
+
+        function renderVizGrid() {
+            const grid = document.getElementById('viz-grid');
+            const allItems = [...businesses.slice(0, 5).map(b => ({ ...b, isBiz: true })), ...buildings.slice(0, 5).map(b => ({ ...b, isBiz: false }))];
+            grid.innerHTML = allItems.map(item => {
+                if (item.isBiz) {
+                    return `<div class="viz-cell ${getScoreClass(item.score)}" onclick="showBusinessDetail('${item.id}')" title="${item.name}">${item.icon}</div>`;
+                } else {
+                    return `<div class="viz-cell building" onclick="showBuildingDetail('${item.id}')" title="${item.name}">🏛️</div>`;
+                }
+            }).join('');
+        }
+
+        function calculatePulseStats() {
+            const bizAvg = businesses.reduce((s, b) => s + b.score, 0) / businesses.length;
+            const bldgScores = buildings.map(b => 5 - (b.ec - 250) / 50); // Normalize EC to ~1-5 scale
+            const bldgAvg = bldgScores.reduce((s, v) => s + Math.max(1, Math.min(5, v)), 0) / buildings.length;
+            const overall = (bizAvg + bldgAvg) / 2;
+
+            document.getElementById('overall-score').textContent = overall.toFixed(1);
+            document.getElementById('biz-score').textContent = bizAvg.toFixed(1);
+            document.getElementById('bldg-score').textContent = bldgAvg.toFixed(1);
+
+            const grade = overall >= 4 ? 'LOW IMPACT' : overall >= 3 ? 'MODERATE IMPACT' : 'HIGH IMPACT';
+            document.getElementById('overall-grade').textContent = grade;
+            document.getElementById('overall-grade').style.background = overall >= 4 ? 'var(--pulse-green)' : overall >= 3 ? 'var(--pulse-yellow)' : 'var(--pulse-red)';
+
+            const goodCount = businesses.filter(b => b.score >= 4).length;
+            const badCount = businesses.filter(b => b.score < 3).length;
+            document.getElementById('excellent-count').textContent = goodCount;
+            document.getElementById('poor-count').textContent = badCount;
+
+            const goodPct = Math.round(goodCount / businesses.length * 100);
+            const badPct = Math.round(badCount / businesses.length * 100);
+            const medPct = 100 - goodPct - badPct;
+            document.getElementById('biz-good-pct').textContent = goodPct + '%';
+            document.getElementById('biz-med-pct').textContent = medPct + '%';
+            document.getElementById('biz-bad-pct').textContent = badPct + '%';
+            document.getElementById('biz-good-bar').style.width = goodPct + '%';
+            document.getElementById('biz-med-bar').style.width = medPct + '%';
+            document.getElementById('biz-bad-bar').style.width = badPct + '%';
+        }
+
+        function renderReviewsList() {
+            const list = document.getElementById('reviews-list');
+            
+            if (myReviews.length === 0) {
+                list.innerHTML = `<div class="empty-state"><div class="empty-icon">✍️</div><div class="empty-title">No reviews yet</div><div class="empty-text">Visit places and share your carbon insights</div></div>`;
+                return;
+            }
+
+            const sortedReviews = [...myReviews].sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            let html = `<div class="section-label"><span>${myReviews.length} REVIEWS</span><span>BY DATE</span></div>`;
+            
+            sortedReviews.forEach(review => {
+                let place, icon, clickHandler;
+                if (review.type === 'business') {
+                    place = businesses.find(b => b.id === review.placeId);
+                    icon = place?.icon || '📍';
+                    clickHandler = `showBusinessDetail('${review.placeId}')`;
+                } else {
+                    place = buildings.find(b => b.id === review.placeId);
+                    icon = '🏛️';
+                    clickHandler = `showBuildingDetail('${review.placeId}')`;
+                }
+                
+                if (!place) return;
+                
+                const dateStr = new Date(review.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                const sc = getScoreClass(review.score);
+                
+                html += `
+                    <div class="review-item" onclick="${clickHandler}">
+                        <div class="review-item-header">
+                            <div>
+                                <div class="review-item-name">${icon} ${place.name}</div>
+                                <div class="review-item-meta">${review.type === 'business' ? place.type : 'BUILDING • ' + place.yearBuilt}</div>
+                            </div>
+                            <div class="review-item-score ${sc}">${review.score.toFixed(1)}</div>
+                        </div>
+                        <div class="review-item-text">"${review.text}"</div>
+                        <div class="review-item-date">${dateStr}</div>
+                    </div>
+                `;
+            });
+            
+            list.innerHTML = html;
+        }
+
+        function setExploreView(view) {
+            exploreView = view;
+            document.getElementById('biz-toggle').classList.toggle('active', view === 'businesses');
+            document.getElementById('bldg-toggle').classList.toggle('active', view === 'buildings');
+            renderExploreList();
+        }
+
+        function showScreen(id) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+        }
+
+        function showExplore() { showScreen('explore-screen'); renderExploreList(); }
+        function showPulse() { showScreen('pulse-screen'); calculatePulseStats(); renderVizGrid(); }
+        function showReviews() { showScreen('reviews-screen'); renderReviewsList(); }
+        function showUserProfile() { showScreen('user-screen'); }
+
+        function showBusinessDetail(id) {
+            const b = businesses.find(x => x.id === id);
+            if (!b) return;
+            const sc = getScoreClass(b.score);
+            const col = sc === 'good' ? 'green' : sc === 'medium' ? 'yellow' : 'red';
+
+            document.getElementById('detail-container').innerHTML = `
+                <div class="screen active" id="detail-screen">
+                    <div class="profile-header-nav">
+                        <button class="back-btn" onclick="showExplore()">←</button>
+                        <span style="font-weight:600">${b.name}</span>
+                        <div style="width:36px"></div>
+                    </div>
+                    <div class="profile-hero ${sc}">
+                        <div class="profile-type">${b.type}</div>
+                        <div class="profile-title">${b.name}</div>
+                        <div class="profile-score-row">
+                            <div class="profile-score-big" style="color:var(--pulse-${col})">${b.score.toFixed(1)}</div>
+                            <div class="profile-score-label">Carbon Score<br>${b.reviews.length} reviews</div>
+                        </div>
+                        <div class="profile-meta">${b.distance} from Avery • ${b.tag}</div>
+                    </div>
+                    <div class="profile-content">
+                        <div class="section-title">ABOUT</div>
+                        <div class="about-text">${b.about}</div>
+                        <div class="section-title">CARBON IMPACT</div>
+                        <div class="impact-card ${sc}"><ul class="impact-list">${b.impact.map(i=>`<li>${i}</li>`).join('')}</ul></div>
+                        <div class="section-title">REVIEWS</div>
+                        ${b.reviews.map(r=>`<div class="review-card"><div class="review-header"><div class="reviewer">${r.user}</div><div class="review-score ${getScoreClass(r.score)}">${r.score.toFixed(1)}</div></div><div class="review-text">${r.text}</div></div>`).join('')}
+                    </div>
+                </div>`;
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById('detail-screen').classList.add('active');
+        }
+
+        function showBuildingDetail(id) {
+            const b = buildings.find(x => x.id === id);
+            if (!b) return;
+
+            document.getElementById('detail-container').innerHTML = `
+                <div class="screen active" id="detail-screen">
+                    <div class="profile-header-nav">
+                        <button class="back-btn" onclick="showExplore()">←</button>
+                        <span style="font-weight:600">${b.name}</span>
+                        <div style="width:36px"></div>
+                    </div>
+                    <div class="profile-hero building">
+                        <div class="profile-type">BUILDING • ${b.yearBuilt}</div>
+                        <div class="profile-title">${b.name}</div>
+                        <div class="profile-score-row">
+                            <div class="profile-score-big" style="color:var(--pulse-blue)">${b.ec}</div>
+                            <div class="profile-score-label">kg CO₂e/m²<br>Embodied Carbon</div>
+                        </div>
+                        <div class="profile-meta">${b.address} • ${b.stories} stories</div>
+                    </div>
+                    <div class="profile-content">
+                        <div class="section-title">ABOUT</div>
+                        <div class="about-text">${b.about}</div>
+                        <div class="section-title">BUILDING DATA</div>
+                        <div class="detail-grid">
+                            <div class="detail-item"><div class="detail-label">ARCHITECT</div><div class="detail-value">${b.architect}</div></div>
+                            <div class="detail-item"><div class="detail-label">YEAR</div><div class="detail-value">${b.yearBuilt}</div></div>
+                            <div class="detail-item"><div class="detail-label">MATERIALS</div><div class="detail-value">${b.materials}</div></div>
+                            <div class="detail-item"><div class="detail-label">AREA</div><div class="detail-value">${b.grossArea}</div></div>
+                        </div>
+                        <div class="section-title">CARBON CONSIDERATIONS</div>
+                        <div class="impact-card building"><ul class="impact-list">${b.impact.map(i=>`<li>${i}</li>`).join('')}</ul></div>
+                        <div class="section-title">REVIEWS</div>
+                        ${b.reviews.map(r=>`<div class="review-card"><div class="review-header"><div class="reviewer">${r.user}</div><div class="review-score good">${r.score.toFixed(1)}</div></div><div class="review-text">${r.text}</div></div>`).join('')}
+                    </div>
+                </div>`;
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById('detail-screen').classList.add('active');
+        }
+    </script>
+</body>
+</html>
